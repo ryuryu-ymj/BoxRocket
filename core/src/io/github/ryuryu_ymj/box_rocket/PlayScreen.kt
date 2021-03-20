@@ -23,15 +23,13 @@ class PlayScreen : KtxScreen {
     private val world = createWorld(vec2(0f, -2f))
     private val debugRenderer = Box2DDebugRenderer()
 
+    private val course = CourseReader()
     private val rocket = Rocket(world, 0f, 0f)
 
     init {
         camera.position.set(0f, 0f, 0f)
+        course.readCourse(1, world)
         stage.addActor(rocket)
-        Box(world, -9f, -8f, 18f, 1f)
-        Box(world, -9f, -9f, 18f, 1f)
-        Box(world, -10f, -8f, 1f, 18f)
-        Box(world, 9f, -8f, 6f, 2f)
     }
 
     override fun resize(width: Int, height: Int) {
