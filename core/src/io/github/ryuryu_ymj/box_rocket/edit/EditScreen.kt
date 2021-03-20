@@ -10,12 +10,15 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.TextField
+import com.badlogic.gdx.utils.Json
 import com.badlogic.gdx.utils.viewport.FitViewport
 import io.github.ryuryu_ymj.box_rocket.MyGame
 import io.github.ryuryu_ymj.box_rocket.play.PlayScreen
 import io.github.ryuryu_ymj.box_rocket.play.courseIndex
 import ktx.app.KtxScreen
 import ktx.graphics.use
+import ktx.json.addClassTag
+import ktx.json.fromJson
 import ktx.math.vec2
 import ktx.scene2d.actors
 import ktx.scene2d.table
@@ -42,15 +45,18 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
 
     private val bg = BackGround(stage.width, stage.height)
     private val courseComponents = mutableListOf<CourseComponent>()
-    private lateinit var tee: CourseComponent
-    private lateinit var hole: CourseComponent
+    private var start: CourseComponent? = null
 
     private var isSelecting = false
     private val selectBegin = vec2()
     private val selectEnd = vec2()
 
     private val brush = Brush()
-    private val courseIndexField: TextField
+    private val courseIndexText: TextField
+
+    private val json = Json().apply {
+        addClassTag<CourseComponentData>("CCD")
+    }
 
     init {
         stage.addActor(bg)
@@ -62,7 +68,7 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
                 //debug = true
                 top()
                 add(brush).expandX().left()
-                courseIndexField = textField(text = courseIndex.toString()) {
+                courseIndexText = textField(text = courseIndex.toString()) {
                     it.expandX().right()
                 }
             }
@@ -71,10 +77,33 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
 
     override fun show() {
         stage.addActor(bg)
+
+        try {
+            val file = Gdx.files.internal("course/${"%02d".format(courseIndex)}raw")
+            val dataList = json.fromJson<Array<CourseComponentData>>(file.readString())
+            dataList.forEach {
+                val component = it.toCourseComponent(game.asset)
+                courseComponents.add(component)
+                stage.addActor(component)
+                if (component.type == CourseComponentType.START) {
+                    start = component
+                }
+            }
+        } catch (e: Exception) {
+            println(e)
+        }
+        if (start == null) {
+            start = CourseComponent(game.asset, CourseComponentType.START, 0, 0).also {
+                courseComponents.add(it)
+                stage.addActor(it)
+            }
+        }
+
         Gdx.input.inputProcessor = input
     }
 
     override fun hide() {
+        start = null
         courseComponents.clear()
         stage.clear()
         Gdx.input.inputProcessor = null
@@ -94,8 +123,10 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
             shape.use(ShapeRenderer.ShapeType.Filled, camera.combined) {
                 it.setColor(1f, 0f, 0f, 0.2f)
                 it.rect(
-                    selectBegin.x, selectBegin.y,
-                    selectEnd.x - selectBegin.x, selectEnd.y - selectBegin.y
+                    selectBegin.x,
+                    selectBegin.y,
+                    selectEnd.x - selectBegin.x,
+                    selectEnd.y - selectBegin.y
                 )
             }
             Gdx.gl.glDisable(GL20.GL_BLEND)
@@ -121,33 +152,37 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
             Gdx.input.isKeyJustPressed(Input.Keys.S)
         ) {
             // save
+            val data = courseComponents.map { it.toCourseComponentData() }
+            val file = Gdx.files.local("course/${"%02d".format(courseIndex)}raw")
+            json.toJson(data, file)
+            println("save body file to ${file.path()}")
         } else if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) &&
             Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) &&
             Gdx.input.isKeyJustPressed(Input.Keys.A)
         ) {
             // clear course components
             courseComponents.forEach {
-                if (it !== tee && it !== hole) {
+                if (it !== start) {
                     it.remove()
                 }
             }
             courseComponents.clear()
-            courseComponents.add(tee)
+            start?.let { courseComponents.add(it) }
         } else if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) &&
             Gdx.input.isKeyJustPressed(Input.Keys.P)
         ) {
             // move to playScreen
             game.setScreen<PlayScreen>()
         } else if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER) &&
-            courseIndexField.hasKeyboardFocus()
+            courseIndexText.hasKeyboardFocus()
         ) {
             uiStage.unfocusAll()
             // open a new course
             try {
-                courseIndex = courseIndexField.text.toInt()
+                courseIndex = courseIndexText.text.toInt()
                 game.setScreen<EditScreen>()
             } catch (e: NumberFormatException) {
-                println("invalid input : " + courseIndexField.text)
+                println("invalid input : " + courseIndexText.text)
             }
         }
     }
@@ -212,7 +247,7 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
 
     private fun removeCourseComponent(ix: Int, iy: Int): Boolean {
         val old = courseComponents.findAt(ix, iy) ?: return false
-        if (old === tee) return false
+        if (old === start) return false
         old.remove()
         courseComponents.remove(old)
         return true

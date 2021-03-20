@@ -15,6 +15,7 @@ class MyGame : KtxGame<KtxScreen>() {
 
     override fun create() {
         asset.load<Texture>("image/ground.png")
+        asset.load<Texture>("image/start.png")
         asset.load<Skin>("skin/test-skin.json")
 
         asset.finishLoading()

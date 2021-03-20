@@ -10,7 +10,7 @@ const val COMPONENT_UNIT_SIZE = 1f
 class CourseComponent(
     asset: AssetManager,
     val type: CourseComponentType,
-    val ix: Int, val iy: Int,
+    val ix: Int, val iy: Int
 ) : Actor() {
     var rightContacted = false; private set
     var leftContacted = false; private set
@@ -27,6 +27,9 @@ class CourseComponent(
         batch.draw(texture, x, y, width, height)
     }
 
+    fun toCourseComponentData() =
+        CourseComponentData(type, ix, iy)
+
     fun setContact(components: List<CourseComponent>) {
         rightContacted = components.findAt(ix + 1, iy) != null
         leftContacted = components.findAt(ix - 1, iy) != null
@@ -39,8 +42,18 @@ fun List<CourseComponent>.findAt(ix: Int, iy: Int) = find {
     ix == it.ix && iy == it.iy
 }
 
+class CourseComponentData(
+    private val type: CourseComponentType = CourseComponentType.GROUND,
+    private val ix: Int = 0,
+    private val iy: Int = 0
+) {
+    fun toCourseComponent(asset: AssetManager) =
+        CourseComponent(asset, type, ix, iy)
+}
+
 enum class CourseComponentType(
     val texturePath: String
 ) {
-    GROUND("image/ground.png")
+    GROUND("image/ground.png"),
+    START("image/start.png")
 }
