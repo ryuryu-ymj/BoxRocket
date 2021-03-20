@@ -218,6 +218,8 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
             val rangeY = min(beginIY, endIY)..max(beginIY, endIY)
 
             when (brush.type) {
+                BrushType.MOVE -> {
+                }
                 BrushType.DELETE -> {
                     for (ix in rangeX) {
                         for (iy in rangeY) {
@@ -230,6 +232,14 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
                         for (iy in rangeY) {
                             addCourseComponent(CourseComponentType.GROUND, ix, iy)
                         }
+                    }
+                }
+                BrushType.START -> {
+                    removeCourseComponent(beginIX, beginIY)
+                    addCourseComponent(CourseComponentType.START, beginIX, beginIY)?.let {
+                        courseComponents.remove(start)
+                        start?.remove()
+                        start = it
                     }
                 }
             }
