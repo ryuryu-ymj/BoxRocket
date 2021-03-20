@@ -23,6 +23,7 @@ import ktx.math.vec2
 import ktx.scene2d.actors
 import ktx.scene2d.table
 import ktx.scene2d.textField
+import java.io.PrintWriter
 import kotlin.math.max
 import kotlin.math.min
 
@@ -99,6 +100,7 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
             }
         }
 
+        start?.let { camera.position.set(it.x + it.originX, it.y + it.originY, 0f) }
         Gdx.input.inputProcessor = input
     }
 
@@ -156,6 +158,8 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
             val file = Gdx.files.local("course/${"%02d".format(courseIndex)}raw")
             json.toJson(data, file)
             println("save body file to ${file.path()}")
+
+            saveBodyFile()
         } else if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) &&
             Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) &&
             Gdx.input.isKeyJustPressed(Input.Keys.A)
@@ -259,5 +263,67 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
         stage.dispose()
         uiStage.dispose()
         batch.dispose()
+    }
+
+    private fun saveBodyFile() {
+        val file = Gdx.files.local("course/${"%02d".format(courseIndex)}body")
+        val writer = PrintWriter(file.writer(false))
+
+        val start = start ?: return
+        val courseComponents = courseComponents.toMutableList()
+        courseComponents.forEach {
+            it.setContact(courseComponents)
+        }
+
+        // horizontal box
+        while (true) {
+            val left = courseComponents.filter {
+                (!it.topContacted || !it.bottomContacted)
+            }.minByOrNull {
+                it.ix
+            } ?: break
+            courseComponents.remove(left)
+            var iw = 1
+            while (true) {
+                val next = courseComponents.find {
+                    it.ix == left.ix + iw && it.iy == left.iy &&
+                            (!it.topContacted || !it.bottomContacted)
+                } ?: break
+                courseComponents.remove(next)
+                iw++
+            }
+            val x = (left.ix - start.ix) * COMPONENT_UNIT_SIZE
+            val y = (left.iy - start.iy - 1) * COMPONENT_UNIT_SIZE
+            val w = iw * COMPONENT_UNIT_SIZE
+            val h = 1 * COMPONENT_UNIT_SIZE
+            writer.println("ground,$x,$y,$w,$h,")
+        }
+
+        // vertical box
+        while (true) {
+            val bottom = courseComponents.filter {
+                (!it.rightContacted || !it.leftContacted)
+            }.minByOrNull {
+                it.iy
+            } ?: break
+            courseComponents.remove(bottom)
+            var ih = 1
+            while (true) {
+                val next = courseComponents.find {
+                    it.ix == bottom.ix && it.iy == bottom.iy + ih &&
+                            (!it.rightContacted || !it.leftContacted)
+                } ?: break
+                courseComponents.remove(next)
+                ih++
+            }
+            val x = (bottom.ix - start.ix) * COMPONENT_UNIT_SIZE
+            val y = (bottom.iy - start.iy - 1) * COMPONENT_UNIT_SIZE
+            val w = 1 * COMPONENT_UNIT_SIZE
+            val h = ih * COMPONENT_UNIT_SIZE
+            writer.println("ground,$x,$y,$w,$h,")
+        }
+
+        writer.close()
+        println("save body file to course/${"%02d".format(courseIndex)}body")
     }
 }

@@ -22,7 +22,7 @@ class MyGame : KtxGame<KtxScreen>() {
 
         Scene2DSkin.defaultSkin = asset.get("skin/test-skin.json")
 
-        addScreen(PlayScreen())
+        addScreen(PlayScreen(this))
         addScreen(EditScreen(this))
         setScreen<EditScreen>()
     }

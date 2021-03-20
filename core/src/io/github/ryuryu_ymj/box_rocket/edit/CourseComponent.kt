@@ -21,6 +21,7 @@ class CourseComponent(
     init {
         setPosition(ix * COMPONENT_UNIT_SIZE, iy * COMPONENT_UNIT_SIZE)
         setSize(COMPONENT_UNIT_SIZE, COMPONENT_UNIT_SIZE)
+        setOrigin(width / 2, height / 2)
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {

@@ -5,15 +5,18 @@ import com.badlogic.gdx.Input
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
+import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FitViewport
+import io.github.ryuryu_ymj.box_rocket.MyGame
+import io.github.ryuryu_ymj.box_rocket.edit.EditScreen
 import ktx.app.KtxScreen
 import ktx.box2d.createWorld
 import ktx.math.vec2
 
 var courseIndex = 1
 
-class PlayScreen : KtxScreen {
+class PlayScreen(private val game: MyGame) : KtxScreen {
     private val batch = SpriteBatch()
     private val camera = OrthographicCamera(25.6f, 14.4f)
     private val viewport = FitViewport(
@@ -22,16 +25,24 @@ class PlayScreen : KtxScreen {
     )
     private val stage = Stage(viewport, batch)
 
-    private val world = createWorld(vec2(0f, -2f))
+    private val gravity = vec2(0f, -2f)
+    private lateinit var world: World
     private val debugRenderer = Box2DDebugRenderer()
 
     private val course = CourseReader()
-    private val rocket = Rocket(world, 0f, 0f)
+    private lateinit var rocket: Rocket
 
-    init {
-        camera.position.set(0f, 0f, 0f)
+    override fun show() {
+        world = createWorld(gravity)
+        rocket = Rocket(world, 0f, 0f)
+        camera.position.set(rocket.x + rocket.originX, rocket.y + rocket.originY, 0f)
         course.readCourse(courseIndex, world)
         stage.addActor(rocket)
+    }
+
+    override fun hide() {
+        world.dispose()
+        stage.clear()
     }
 
     override fun resize(width: Int, height: Int) {
@@ -50,6 +61,12 @@ class PlayScreen : KtxScreen {
         world.step(1f / 60, 6, 2)
         stage.act()
         camera.position.set(rocket.x + rocket.originX, rocket.y + rocket.originY, 0f)
+
+        if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) &&
+            Gdx.input.isKeyJustPressed(Input.Keys.E)
+        ) {
+            game.setScreen<EditScreen>()
+        }
     }
 
     override fun dispose() {
