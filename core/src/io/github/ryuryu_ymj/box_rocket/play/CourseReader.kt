@@ -1,4 +1,4 @@
-package io.github.ryuryu_ymj.box_rocket
+package io.github.ryuryu_ymj.box_rocket.play
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.files.FileHandle

@@ -1,4 +1,4 @@
-package io.github.ryuryu_ymj.box_rocket
+package io.github.ryuryu_ymj.box_rocket.play
 
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.physics.box2d.Body

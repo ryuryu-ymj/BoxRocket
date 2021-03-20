@@ -1,5 +1,6 @@
 package io.github.ryuryu_ymj.box_rocket
 
+import io.github.ryuryu_ymj.box_rocket.play.PlayScreen
 import ktx.app.KtxGame
 import ktx.app.KtxScreen
 
