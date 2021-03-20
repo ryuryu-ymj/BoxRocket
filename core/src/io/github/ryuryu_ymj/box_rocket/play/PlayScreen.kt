@@ -11,6 +11,8 @@ import ktx.app.KtxScreen
 import ktx.box2d.createWorld
 import ktx.math.vec2
 
+var courseIndex = 1
+
 class PlayScreen : KtxScreen {
     private val batch = SpriteBatch()
     private val camera = OrthographicCamera(25.6f, 14.4f)
@@ -28,7 +30,7 @@ class PlayScreen : KtxScreen {
 
     init {
         camera.position.set(0f, 0f, 0f)
-        course.readCourse(1, world)
+        course.readCourse(courseIndex, world)
         stage.addActor(rocket)
     }
 
