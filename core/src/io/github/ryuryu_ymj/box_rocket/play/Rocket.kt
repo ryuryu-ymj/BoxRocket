@@ -31,6 +31,8 @@ class Rocket(private val world: World, centerX: Float, centerY: Float) : Actor()
                 density = 0f
             }
             type = BodyDef.BodyType.DynamicBody
+            linearDamping = 0.1f
+            angularDamping = 1f
             position.set(x + originX, y + originY)
         }
         body.setTransform(body.position, rotation * MathUtils.degreesToRadians)
@@ -57,7 +59,7 @@ class Rocket(private val world: World, centerX: Float, centerY: Float) : Actor()
         //println("min=${minFrac}")
 
         val f = 40f / (minFrac + 0.1f)
-        println("jet: $f, weight: ${body.mass * world.gravity.len()}")
+        //println("jet: $f, weight: ${body.mass * world.gravity.len()}")
         body.applyForceToCenter(
             f * MathUtils.cosDeg(rotation),
             f * MathUtils.sinDeg(rotation),
