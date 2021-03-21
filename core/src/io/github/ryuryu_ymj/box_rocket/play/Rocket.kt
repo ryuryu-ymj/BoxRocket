@@ -5,16 +5,15 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Actor
+import io.github.ryuryu_ymj.box_rocket.edit.COMPONENT_UNIT_SIZE
 import ktx.box2d.*
 import ktx.math.vec2
-
-const val ROCKET_SIZE = 1f
 
 class Rocket(private val world: World, x: Float, y: Float) : Actor() {
     private val body: Body
 
     init {
-        setSize(ROCKET_SIZE, ROCKET_SIZE)
+        setSize(COMPONENT_UNIT_SIZE * 0.98f, COMPONENT_UNIT_SIZE * 0.98f)
         setOrigin(width / 2, height / 2)
         setPosition(x, y)
         rotation = 90f
