@@ -6,9 +6,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.utils.GdxRuntimeException
 import ktx.box2d.body
-import ktx.box2d.box
 import ktx.box2d.loop
-import ktx.math.vec2
 
 class CourseReader {
     fun readCourse(index: Int, world: World) {
