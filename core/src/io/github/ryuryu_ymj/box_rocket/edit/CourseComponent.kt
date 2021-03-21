@@ -4,8 +4,9 @@ import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.scenes.scene2d.Actor
+import io.github.ryuryu_ymj.box_rocket.play.ROCKET_SIZE
 
-const val COMPONENT_UNIT_SIZE = 1f
+const val COMPONENT_UNIT_SIZE = ROCKET_SIZE
 
 class CourseComponent(
     asset: AssetManager,

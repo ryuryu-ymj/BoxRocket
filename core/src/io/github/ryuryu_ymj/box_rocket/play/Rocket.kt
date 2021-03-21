@@ -5,22 +5,37 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Actor
-import ktx.box2d.RayCast
-import ktx.box2d.body
-import ktx.box2d.box
-import ktx.box2d.rayCast
+import ktx.box2d.*
 import ktx.math.vec2
 
-class Rocket(private val world: World, centerX: Float, centerY: Float) : Actor() {
+const val ROCKET_SIZE = 1f
+
+class Rocket(private val world: World, x: Float, y: Float) : Actor() {
     private val body: Body
 
     init {
-        setSize(1f, 1f)
+        setSize(ROCKET_SIZE, ROCKET_SIZE)
         setOrigin(width / 2, height / 2)
-        setPosition(centerX - originX, centerY - originY)
+        setPosition(x, y)
         rotation = 90f
         body = world.body {
-            box(width, height) {
+            /*box(width, height) {
+                density = 10f
+                friction = 0.5f
+            }*/
+            val cnr = width / 8
+            polygon(
+                floatArrayOf(
+                    -originX + cnr, -originY,
+                    originX - cnr, -originY,
+                    originX, -originY + cnr,
+                    originX, originY - cnr,
+                    originX - cnr, originY,
+                    -originX + cnr, originY,
+                    -originX, originY - cnr,
+                    -originX, -originY + cnr,
+                )
+            ) {
                 density = 10f
                 friction = 0.5f
             }
@@ -32,7 +47,8 @@ class Rocket(private val world: World, centerX: Float, centerY: Float) : Actor()
             }
             type = BodyDef.BodyType.DynamicBody
             linearDamping = 0.1f
-            angularDamping = 1f
+            //angularDamping = 1f
+            fixedRotation = true
             position.set(x + originX, y + originY)
         }
         body.setTransform(body.position, rotation * MathUtils.degreesToRadians)

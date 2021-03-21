@@ -20,7 +20,8 @@ class Brush : Label("MOVE", Scene2DSkin.defaultSkin, defaultStyle) {
                 type = BrushType.DELETE
                 setText(type.name)
             }
-            Gdx.input.isKeyJustPressed(Input.Keys.S) -> {
+            Gdx.input.isKeyJustPressed(Input.Keys.S) &&
+                    !Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) -> {
                 type = BrushType.START
                 setText(type.name)
             }

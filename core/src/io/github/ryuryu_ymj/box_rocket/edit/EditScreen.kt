@@ -281,6 +281,7 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
 
         val start = start ?: return
         val courseComponents = courseComponents.toMutableList()
+        courseComponents.remove(start)
         courseComponents.forEach {
             it.setContact(courseComponents)
         }
@@ -303,7 +304,7 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
                 iw++
             }
             val x = (left.ix - start.ix) * COMPONENT_UNIT_SIZE
-            val y = (left.iy - start.iy - 1) * COMPONENT_UNIT_SIZE
+            val y = (left.iy - start.iy) * COMPONENT_UNIT_SIZE
             val w = iw * COMPONENT_UNIT_SIZE
             val h = 1 * COMPONENT_UNIT_SIZE
             writer.println("ground,$x,$y,$w,$h,")
@@ -327,7 +328,7 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
                 ih++
             }
             val x = (bottom.ix - start.ix) * COMPONENT_UNIT_SIZE
-            val y = (bottom.iy - start.iy - 1) * COMPONENT_UNIT_SIZE
+            val y = (bottom.iy - start.iy) * COMPONENT_UNIT_SIZE
             val w = 1 * COMPONENT_UNIT_SIZE
             val h = ih * COMPONENT_UNIT_SIZE
             writer.println("ground,$x,$y,$w,$h,")

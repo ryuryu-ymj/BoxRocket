@@ -71,7 +71,7 @@ class PlayScreen(private val game: MyGame) : KtxScreen {
 
     override fun dispose() {
         debugRenderer.dispose()
-        world.dispose()
+        //world.dispose()
         stage.dispose()
         batch.dispose()
     }
