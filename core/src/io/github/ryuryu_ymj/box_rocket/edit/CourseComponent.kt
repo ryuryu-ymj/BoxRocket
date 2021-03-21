@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.scenes.scene2d.Actor
 import io.github.ryuryu_ymj.box_rocket.play.ROCKET_SIZE
+import ktx.collections.GdxArray
+import ktx.collections.gdxArrayOf
 
 const val COMPONENT_UNIT_SIZE = ROCKET_SIZE
 

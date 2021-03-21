@@ -16,6 +16,9 @@ import io.github.ryuryu_ymj.box_rocket.MyGame
 import io.github.ryuryu_ymj.box_rocket.play.PlayScreen
 import io.github.ryuryu_ymj.box_rocket.play.courseIndex
 import ktx.app.KtxScreen
+import ktx.collections.GdxArray
+import ktx.collections.isNotEmpty
+import ktx.collections.lastIndex
 import ktx.graphics.use
 import ktx.json.addClassTag
 import ktx.json.fromJson
@@ -282,56 +285,56 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
         val start = start ?: return
         val courseComponents = courseComponents.toMutableList()
         courseComponents.remove(start)
+
+        val edges = GdxArray<Edge>()
         courseComponents.forEach {
             it.setContact(courseComponents)
+            val v = arrayOf(
+                IntVec2(it.ix, it.iy),
+                IntVec2(it.ix + 1, it.iy),
+                IntVec2(it.ix + 1, it.iy + 1),
+                IntVec2(it.ix, it.iy + 1),
+            )
+            val contact = arrayOf(
+                it.bottomContacted,
+                it.rightContacted,
+                it.topContacted,
+                it.leftContacted,
+            )
+            for (i in 0..3) {
+                if (!contact[i]) {
+                    edges.add(Edge(v[i], v[(i + 1) % 4]))
+                }
+            }
         }
 
-        // horizontal box
-        while (true) {
-            val left = courseComponents.filter {
-                (!it.topContacted || !it.bottomContacted)
-            }.minByOrNull {
-                it.ix
-            } ?: break
-            courseComponents.remove(left)
-            var iw = 1
+        while (edges.isNotEmpty()) {
+            val graph = GdxArray<IntVec2>()
+            graph.add(edges[0].begin)
             while (true) {
-                val next = courseComponents.find {
-                    it.ix == left.ix + iw && it.iy == left.iy &&
-                            (!it.topContacted || !it.bottomContacted)
-                } ?: break
-                courseComponents.remove(next)
-                iw++
+                val edge = edges.find { it.begin == graph.last() } ?: break
+                graph.add(edge.end)
+                edges.removeValue(edge, true)
+                if (graph.first() == graph.last()) {
+                    break
+                }
             }
-            val x = (left.ix - start.ix) * COMPONENT_UNIT_SIZE
-            val y = (left.iy - start.iy) * COMPONENT_UNIT_SIZE
-            val w = iw * COMPONENT_UNIT_SIZE
-            val h = 1 * COMPONENT_UNIT_SIZE
-            writer.println("ground,$x,$y,$w,$h,")
-        }
-
-        // vertical box
-        while (true) {
-            val bottom = courseComponents.filter {
-                (!it.rightContacted || !it.leftContacted)
-            }.minByOrNull {
-                it.iy
-            } ?: break
-            courseComponents.remove(bottom)
-            var ih = 1
-            while (true) {
-                val next = courseComponents.find {
-                    it.ix == bottom.ix && it.iy == bottom.iy + ih &&
-                            (!it.rightContacted || !it.leftContacted)
-                } ?: break
-                courseComponents.remove(next)
-                ih++
+            val loop = GdxArray<IntVec2>()
+            for (i in 0 until graph.lastIndex) {
+                val prev = graph[i] -
+                        if (i == 0) graph[graph.lastIndex - 1]
+                        else graph[i - 1]
+                val next = graph[i + 1] - graph[i]
+                if (prev.crs(next) != 0) {
+                    loop.add(graph[i])
+                }
             }
-            val x = (bottom.ix - start.ix) * COMPONENT_UNIT_SIZE
-            val y = (bottom.iy - start.iy) * COMPONENT_UNIT_SIZE
-            val w = 1 * COMPONENT_UNIT_SIZE
-            val h = ih * COMPONENT_UNIT_SIZE
-            writer.println("ground,$x,$y,$w,$h,")
+            writer.print("ground,")
+            loop.forEach {
+                writer.print("${(it.x - start.ix) * COMPONENT_UNIT_SIZE},")
+                writer.print("${(it.y - start.iy) * COMPONENT_UNIT_SIZE},")
+            }
+            writer.println()
         }
 
         writer.close()

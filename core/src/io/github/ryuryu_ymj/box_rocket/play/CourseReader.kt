@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.utils.GdxRuntimeException
 import ktx.box2d.body
 import ktx.box2d.box
+import ktx.box2d.loop
 import ktx.math.vec2
 
 class CourseReader {
@@ -27,16 +28,14 @@ class CourseReader {
             if (cells.isEmpty()) continue
             when (cells[0]) {
                 "ground" -> {
-                    val x = cells[1].toFloat()
-                    val y = cells[2].toFloat()
-                    val w = cells[3].toFloat()
-                    val h = cells[4].toFloat()
+                    val vertices = FloatArray(cells.size - 2) {
+                        cells[it + 1].toFloat()
+                    }
                     world.body {
-                        box(width = w, height = h, position = vec2(w / 2, h / 2)) {
+                        loop(vertices) {
                             restitution = 0f
                             friction = 0.5f
                         }
-                        position.set(x, y)
                         type = BodyDef.BodyType.StaticBody
                     }
                 }

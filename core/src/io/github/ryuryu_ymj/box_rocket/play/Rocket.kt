@@ -19,23 +19,7 @@ class Rocket(private val world: World, x: Float, y: Float) : Actor() {
         setPosition(x, y)
         rotation = 90f
         body = world.body {
-            /*box(width, height) {
-                density = 10f
-                friction = 0.5f
-            }*/
-            val cnr = width / 8
-            polygon(
-                floatArrayOf(
-                    -originX + cnr, -originY,
-                    originX - cnr, -originY,
-                    originX, -originY + cnr,
-                    originX, originY - cnr,
-                    originX - cnr, originY,
-                    -originX + cnr, originY,
-                    -originX, originY - cnr,
-                    -originX, -originY + cnr,
-                )
-            ) {
+            box(width, height) {
                 density = 10f
                 friction = 0.5f
             }
