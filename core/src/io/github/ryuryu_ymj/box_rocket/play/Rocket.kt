@@ -4,9 +4,7 @@ import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.MathUtils
-import com.badlogic.gdx.physics.box2d.Body
-import com.badlogic.gdx.physics.box2d.BodyDef
-import com.badlogic.gdx.physics.box2d.World
+import com.badlogic.gdx.physics.box2d.*
 import com.badlogic.gdx.scenes.scene2d.Actor
 import io.github.ryuryu_ymj.box_rocket.edit.COMPONENT_UNIT_SIZE
 import ktx.box2d.RayCast
@@ -19,6 +17,10 @@ const val GLOBAL_SCALE = 1.005f
 class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) : Actor() {
     private val region = asset.get<TextureAtlas>("atlas/play.atlas").findRegion("rocket")
     private val body: Body
+    private val horizontalSensor: Fixture
+    private var horizontalContact = 0
+    private val verticalSensor: Fixture
+    private var verticalContact = 0
 
     init {
         setSize(COMPONENT_UNIT_SIZE, COMPONENT_UNIT_SIZE)
@@ -37,6 +39,46 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
             fixedRotation = true
             position.set(x + originX, y + originY)
         }
+        horizontalSensor = body.box(width, height / 2) {
+            density = 0f
+            isSensor = true
+        }
+        verticalSensor = body.box(width / 2, height) {
+            density = 0f
+            isSensor = true
+        }
+
+        world.setContactListener(object : ContactListener {
+            override fun beginContact(contact: Contact) {
+                if (contact.fixtureA === horizontalSensor ||
+                    contact.fixtureB === horizontalSensor
+                ) {
+                    horizontalContact++
+                } else if (contact.fixtureA === verticalSensor ||
+                    contact.fixtureB === verticalSensor
+                ) {
+                    verticalContact++
+                }
+            }
+
+            override fun endContact(contact: Contact) {
+                if (contact.fixtureA === horizontalSensor ||
+                    contact.fixtureB === horizontalSensor
+                ) {
+                    horizontalContact--
+                } else if (contact.fixtureA === verticalSensor ||
+                    contact.fixtureB === verticalSensor
+                ) {
+                    verticalContact--
+                }
+            }
+
+            override fun preSolve(contact: Contact, oldManifold: Manifold) {
+            }
+
+            override fun postSolve(contact: Contact, impulse: ContactImpulse) {
+            }
+        })
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
@@ -50,19 +92,16 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
         super.act(delta)
 
         val pos = body.position
-        val v = body.linearVelocity
-        println(v)
-        x = if (v.x == 0f) {
+        x = if (horizontalContact > 0) {
             pos.x.toPixel().toCordi()
         } else {
             pos.x
         } - originX
-        y = if (v.y == 0f) {
+        y = if (verticalContact > 0) {
             pos.y.toPixel().toCordi()
         } else {
             pos.y
         } - originY
-        //rotation = body.angle * MathUtils.radiansToDegrees
     }
 
     fun jet() {
