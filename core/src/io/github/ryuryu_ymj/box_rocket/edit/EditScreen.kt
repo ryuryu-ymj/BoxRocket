@@ -159,7 +159,7 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
             // save
             saveRawFile()
             saveBodyFile()
-            savePixmapFile()
+            saveActorFile()
         } else if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) &&
             Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) &&
             Gdx.input.isKeyJustPressed(Input.Keys.A)
@@ -339,8 +339,8 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
         println("save body file to course/${"%02d".format(courseIndex)}body")
     }
 
-    private fun savePixmapFile() {
-        val file = Gdx.files.local("course/${"%02d".format(courseIndex)}pixmap")
+    private fun saveActorFile() {
+        val file = Gdx.files.local("course/${"%02d".format(courseIndex)}actor")
         val writer = PrintWriter(file.writer(false))
 
         val start = start ?: return
@@ -360,6 +360,6 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
         }
 
         writer.close()
-        println("save pixmap file to course/${"%02d".format(courseIndex)}pixmap")
+        println("save actor file to course/${"%02d".format(courseIndex)}actor")
     }
 }

@@ -16,7 +16,7 @@ import ktx.box2d.loop
 class CourseReader {
     fun readCourse(index: Int, world: World, stage: Stage, asset: AssetManager) {
         readBody(index, world)
-        readPixmap(index, stage, asset)
+        readActor(index, stage, asset)
     }
 
     private fun readBody(index: Int, world: World) {
@@ -47,10 +47,10 @@ class CourseReader {
         }
     }
 
-    private fun readPixmap(index: Int, stage: Stage, asset: AssetManager) {
+    private fun readActor(index: Int, stage: Stage, asset: AssetManager) {
         val file: FileHandle
         try {
-            file = Gdx.files.internal("course/${"%02d".format(index)}pixmap")
+            file = Gdx.files.internal("course/${"%02d".format(index)}actor")
         } catch (e: GdxRuntimeException) {
             Gdx.app.error("my-error", "コースファイルの読み込みに失敗しました", e)
             return
