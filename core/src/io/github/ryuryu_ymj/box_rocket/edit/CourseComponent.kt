@@ -12,10 +12,7 @@ class CourseComponent(
     val type: CourseComponentType,
     val ix: Int, val iy: Int
 ) : Actor() {
-    var rightContacted = false; private set
-    var leftContacted = false; private set
-    var topContacted = false; private set
-    var bottomContacted = false; private set
+    val contact = BooleanArray(4) { false }
     private val texture: Texture = asset.get(type.texturePath)
 
     init {
@@ -32,10 +29,10 @@ class CourseComponent(
         CourseComponentData(type, ix, iy)
 
     fun setContact(components: List<CourseComponent>) {
-        rightContacted = components.findAt(ix + 1, iy) != null
-        leftContacted = components.findAt(ix - 1, iy) != null
-        topContacted = components.findAt(ix, iy + 1) != null
-        bottomContacted = components.findAt(ix, iy - 1) != null
+        contact[0] = components.findAt(ix + 1, iy) != null
+        contact[1] = components.findAt(ix, iy + 1) != null
+        contact[2] = components.findAt(ix - 1, iy) != null
+        contact[3] = components.findAt(ix, iy - 1) != null
     }
 }
 

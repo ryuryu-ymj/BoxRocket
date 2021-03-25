@@ -157,12 +157,9 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
             Gdx.input.isKeyJustPressed(Input.Keys.S)
         ) {
             // save
-            val data = courseComponents.map { it.toCourseComponentData() }
-            val file = Gdx.files.local("course/${"%02d".format(courseIndex)}raw")
-            json.toJson(data, file)
-            println("save body file to ${file.path()}")
-
+            saveRawFile()
             saveBodyFile()
+            savePixmapFile()
         } else if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) &&
             Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT) &&
             Gdx.input.isKeyJustPressed(Input.Keys.A)
@@ -278,6 +275,13 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
         batch.dispose()
     }
 
+    private fun saveRawFile() {
+        val data = courseComponents.map { it.toCourseComponentData() }
+        val file = Gdx.files.local("course/${"%02d".format(courseIndex)}raw")
+        json.toJson(data, file)
+        println("save body file to ${file.path()}")
+    }
+
     private fun saveBodyFile() {
         val file = Gdx.files.local("course/${"%02d".format(courseIndex)}body")
         val writer = PrintWriter(file.writer(false))
@@ -295,15 +299,9 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
                 IntVec2(it.ix + 1, it.iy + 1),
                 IntVec2(it.ix, it.iy + 1),
             )
-            val contact = arrayOf(
-                it.bottomContacted,
-                it.rightContacted,
-                it.topContacted,
-                it.leftContacted,
-            )
             for (i in 0..3) {
-                if (!contact[i]) {
-                    edges.add(Edge(v[i], v[(i + 1) % 4]))
+                if (!it.contact[i]) {
+                    edges.add(Edge(v[(i + 1) % 4], v[(i + 2) % 4]))
                 }
             }
         }
@@ -339,5 +337,29 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
 
         writer.close()
         println("save body file to course/${"%02d".format(courseIndex)}body")
+    }
+
+    private fun savePixmapFile() {
+        val file = Gdx.files.local("course/${"%02d".format(courseIndex)}pixmap")
+        val writer = PrintWriter(file.writer(false))
+
+        val start = start ?: return
+        val courseComponents = courseComponents.toMutableList()
+        courseComponents.remove(start)
+
+        courseComponents.forEach { cmp ->
+            cmp.setContact(courseComponents)
+            var name = "g"
+            cmp.contact.forEach {
+                name += if (it) "1" else "0"
+            }
+            writer.print("$name,")
+            writer.print("${(cmp.ix - start.ix) * COMPONENT_UNIT_SIZE},")
+            writer.print("${(cmp.iy - start.iy) * COMPONENT_UNIT_SIZE},")
+            writer.println()
+        }
+
+        writer.close()
+        println("save pixmap file to course/${"%02d".format(courseIndex)}pixmap")
     }
 }

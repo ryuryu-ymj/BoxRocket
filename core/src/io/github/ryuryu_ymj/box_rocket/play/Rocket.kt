@@ -1,19 +1,22 @@
 package io.github.ryuryu_ymj.box_rocket.play
 
 import com.badlogic.gdx.assets.AssetManager
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Actor
 import io.github.ryuryu_ymj.box_rocket.edit.COMPONENT_UNIT_SIZE
-import ktx.box2d.*
+import ktx.box2d.RayCast
+import ktx.box2d.body
+import ktx.box2d.box
+import ktx.box2d.rayCast
 import ktx.math.vec2
 
 class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) : Actor() {
-    private val texture = asset.get<Texture>("image/rocket.png")
+    private val region = asset.get<TextureAtlas>("atlas/play.atlas").findRegion("rocket")
     private val body: Body
 
     init {
@@ -43,8 +46,8 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
 
     override fun draw(batch: Batch, parentAlpha: Float) {
         batch.draw(
-            texture, x, y, originX, originY, width, height, scaleX, scaleY,
-            rotation, 0, 0, texture.width, texture.height, false, false
+            region, x, y, originX, originY,
+            width, height, scaleX, scaleY, rotation
         )
     }
 
