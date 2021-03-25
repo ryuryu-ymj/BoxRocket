@@ -39,11 +39,11 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
             fixedRotation = true
             position.set(x + originX, y + originY)
         }
-        horizontalSensor = body.box(width, height / 2) {
+        horizontalSensor = body.box(width, height * 0.9f) {
             density = 0f
             isSensor = true
         }
-        verticalSensor = body.box(width / 2, height) {
+        verticalSensor = body.box(width * 0.9f, height) {
             density = 0f
             isSensor = true
         }
