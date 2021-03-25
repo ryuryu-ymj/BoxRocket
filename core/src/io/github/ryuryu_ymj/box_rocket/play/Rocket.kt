@@ -1,5 +1,8 @@
 package io.github.ryuryu_ymj.box_rocket.play
 
+import com.badlogic.gdx.assets.AssetManager
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
@@ -9,7 +12,8 @@ import io.github.ryuryu_ymj.box_rocket.edit.COMPONENT_UNIT_SIZE
 import ktx.box2d.*
 import ktx.math.vec2
 
-class Rocket(private val world: World, x: Float, y: Float) : Actor() {
+class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) : Actor() {
+    private val texture = asset.get<Texture>("image/rocket.png")
     private val body: Body
 
     init {
@@ -37,11 +41,18 @@ class Rocket(private val world: World, x: Float, y: Float) : Actor() {
         body.setTransform(body.position, rotation * MathUtils.degreesToRadians)
     }
 
+    override fun draw(batch: Batch, parentAlpha: Float) {
+        batch.draw(
+            texture, x, y, originX, originY, width, height, scaleX, scaleY,
+            rotation, 0, 0, texture.width, texture.height, false, false
+        )
+    }
+
     override fun act(delta: Float) {
         super.act(delta)
 
         body.position.let { setPosition(it.x - originX, it.y - originY) }
-        rotation = body.angle * MathUtils.radiansToDegrees
+        //rotation = body.angle * MathUtils.radiansToDegrees
     }
 
     fun jet() {

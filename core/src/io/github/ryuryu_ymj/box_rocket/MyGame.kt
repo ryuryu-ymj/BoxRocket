@@ -2,6 +2,7 @@ package io.github.ryuryu_ymj.box_rocket
 
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import io.github.ryuryu_ymj.box_rocket.edit.EditScreen
 import io.github.ryuryu_ymj.box_rocket.play.PlayScreen
@@ -16,6 +17,8 @@ class MyGame : KtxGame<KtxScreen>() {
     override fun create() {
         asset.load<Texture>("image/ground.png")
         asset.load<Texture>("image/start.png")
+        asset.load<Texture>("image/rocket.png")
+        asset.load<TextureAtlas>("atlas/ground.atlas")
         asset.load<Skin>("skin/test-skin.json")
 
         asset.finishLoading()
