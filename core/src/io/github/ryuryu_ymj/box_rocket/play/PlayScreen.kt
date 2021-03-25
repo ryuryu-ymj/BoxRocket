@@ -34,9 +34,9 @@ class PlayScreen(private val game: MyGame) : KtxScreen {
 
     override fun show() {
         world = createWorld(gravity)
+        course.readCourse(courseIndex, world, stage, game.asset)
         rocket = Rocket(game.asset, world, 0f, 0f)
         camera.position.set(rocket.x + rocket.originX, rocket.y + rocket.originY, 0f)
-        course.readCourse(courseIndex, world, stage, game.asset)
         stage.addActor(rocket)
     }
 

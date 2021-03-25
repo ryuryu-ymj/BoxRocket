@@ -7,9 +7,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.badlogic.gdx.utils.GdxRuntimeException
-import io.github.ryuryu_ymj.box_rocket.edit.COMPONENT_UNIT_SIZE
 import ktx.box2d.body
 import ktx.box2d.loop
 
@@ -63,10 +61,7 @@ class CourseReader {
             val region = atlas.findRegion(cells[0])
             val x = cells[1].toFloat()
             val y = cells[2].toFloat()
-            stage.addActor(Image(region).apply {
-                setPosition(x, y)
-                setSize(COMPONENT_UNIT_SIZE, COMPONENT_UNIT_SIZE)
-            })
+            stage.addActor(Ground(region, x, y))
         }
     }
 }

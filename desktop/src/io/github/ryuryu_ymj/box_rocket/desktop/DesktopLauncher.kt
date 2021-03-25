@@ -11,8 +11,8 @@ object DesktopLauncher {
         LwjglApplication(
             MyGame(),
             LwjglApplicationConfiguration().apply {
-                width = 960
-                height = 540
+                width = 1024
+                height = 576
             })
     }
 }

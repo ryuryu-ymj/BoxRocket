@@ -13,27 +13,23 @@ import ktx.box2d.RayCast
 import ktx.box2d.body
 import ktx.box2d.box
 import ktx.box2d.rayCast
-import ktx.math.vec2
+
+const val GLOBAL_SCALE = 1.005f
 
 class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) : Actor() {
     private val region = asset.get<TextureAtlas>("atlas/play.atlas").findRegion("rocket")
     private val body: Body
 
     init {
-        setSize(COMPONENT_UNIT_SIZE * 0.98f, COMPONENT_UNIT_SIZE * 0.98f)
+        setSize(COMPONENT_UNIT_SIZE, COMPONENT_UNIT_SIZE)
         setOrigin(width / 2, height / 2)
         setPosition(x, y)
+        setScale(GLOBAL_SCALE)
         rotation = 90f
         body = world.body {
             box(width, height) {
                 density = 10f
                 friction = 0.5f
-            }
-            box(
-                width = width / 4, height = height / 2,
-                position = vec2(-height * 3 / 8, 0f)
-            ) {
-                density = 0f
             }
             type = BodyDef.BodyType.DynamicBody
             linearDamping = 0.1f
@@ -41,7 +37,6 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
             fixedRotation = true
             position.set(x + originX, y + originY)
         }
-        body.setTransform(body.position, rotation * MathUtils.degreesToRadians)
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
@@ -54,7 +49,19 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
     override fun act(delta: Float) {
         super.act(delta)
 
-        body.position.let { setPosition(it.x - originX, it.y - originY) }
+        val pos = body.position
+        val v = body.linearVelocity
+        println(v)
+        x = if (v.x == 0f) {
+            pos.x.toPixel().toCordi()
+        } else {
+            pos.x
+        } - originX
+        y = if (v.y == 0f) {
+            pos.y.toPixel().toCordi()
+        } else {
+            pos.y
+        } - originY
         //rotation = body.angle * MathUtils.radiansToDegrees
     }
 
@@ -82,6 +89,9 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
 
     fun rotate() {
         rotateBy(-90f)
-        body.setTransform(body.position, rotation * MathUtils.degreesToRadians)
     }
 }
+
+const val PIXEL_SIZE = COMPONENT_UNIT_SIZE / 20
+fun Float.toPixel() = MathUtils.round(this / PIXEL_SIZE)
+fun Int.toCordi() = this * PIXEL_SIZE
