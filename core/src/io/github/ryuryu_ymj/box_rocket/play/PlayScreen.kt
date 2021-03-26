@@ -116,7 +116,7 @@ class PlayScreen(private val game: MyGame) : KtxScreen {
                     clamp((locationWithinTexel - 1.0) / texelsPerPixel + 0.5, 0.0, 0.5);
                 vec2 finalTexCoords = (floor(v_texCoords * texSize) + interpolationAmount) / 
                     texSize;
-                gl_FragColor = v_color * texture2D(u_texture, v_texCoords);
+                gl_FragColor = v_color * texture2D(u_texture, finalTexCoords);
             }
             """.trimIndent()
         batch.shader = ShaderProgram(vertex, fragment)
