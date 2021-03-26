@@ -93,8 +93,8 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
 
         val pos = body.position
         setPosition(
-            pos.x/*.toPixel().toCordi()*/ - originX,
-            pos.y/*.toPixel().toCordi()*/ - originY
+            pos.x.toPixel().toCordi() - originX,
+            pos.y.toPixel().toCordi() - originY
         )
     }
 

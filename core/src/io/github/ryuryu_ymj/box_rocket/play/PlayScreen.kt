@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g3d.Shader
 import com.badlogic.gdx.graphics.glutils.ShaderProgram
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Stage
@@ -15,6 +16,7 @@ import io.github.ryuryu_ymj.box_rocket.edit.EditScreen
 import ktx.app.KtxScreen
 import ktx.box2d.createWorld
 import ktx.math.vec2
+import kotlin.math.round
 
 var courseIndex = 1
 
@@ -107,20 +109,13 @@ class PlayScreen(private val game: MyGame) : KtxScreen {
             varying LOWP vec4 v_color;
             varying vec2 v_texCoords;
             uniform sampler2D u_texture;
-            uniform float texelsPerPixel;
             void main()
             {
-                vec2 texSize = textureSize(u_texture, 0);
-                vec2 locationWithinTexel = fract(v_texCoords * texSize);
-                vec2 interpolationAmount = clamp(locationWithinTexel / texelsPerPixel, 0.0, 0.5) + 
-                    clamp((locationWithinTexel - 1.0) / texelsPerPixel + 0.5, 0.0, 0.5);
-                vec2 finalTexCoords = (floor(v_texCoords * texSize) + interpolationAmount) / 
-                    texSize;
-                gl_FragColor = v_color * texture2D(u_texture, finalTexCoords);
+                gl_FragColor = v_color * texture2D(u_texture, v_texCoords);
             }
             """.trimIndent()
         batch.shader = ShaderProgram(vertex, fragment)
-        batch.shader.setUniformf("texelsPerPixel", 288f / Gdx.graphics.width)
+        //batch.shader.setUniformf("texelsPerPixel", 288f / Gdx.graphics.width)
         //batch.shader.setVertexAttribute()
     }
 
@@ -139,7 +134,7 @@ class PlayScreen(private val game: MyGame) : KtxScreen {
 
     override fun resize(width: Int, height: Int) {
         viewport.update(width, height)
-        batch.shader.setUniformf("texelsPerPixel", 288f / width)
+        //batch.shader.setUniformf("texelsPerPixel", 288f / width)
     }
 
     override fun render(delta: Float) {
@@ -153,7 +148,12 @@ class PlayScreen(private val game: MyGame) : KtxScreen {
         }
         world.step(1f / 60, 6, 2)
         stage.act()
-        camera.position.set(rocket.x + rocket.originX, rocket.y + rocket.originY, 0f)
+        val pixel = stage.height / Gdx.graphics.height
+        camera.position.set(
+            round((rocket.x + rocket.originX) / pixel) * pixel,
+            round((rocket.y + rocket.originY) / pixel) * pixel,
+            0f
+        )
 
         if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) &&
             Gdx.input.isKeyJustPressed(Input.Keys.E)
