@@ -11,6 +11,7 @@ import ktx.box2d.RayCast
 import ktx.box2d.body
 import ktx.box2d.box
 import ktx.box2d.rayCast
+import kotlin.math.round
 
 const val GLOBAL_SCALE = 1.00f
 
@@ -92,9 +93,10 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
         super.act(delta)
 
         val pos = body.position
+        val texel = COMPONENT_UNIT_SIZE / 20
         setPosition(
-            pos.x.toPixel().toCordi() - originX,
-            pos.y.toPixel().toCordi() - originY
+            round(pos.x / texel) * texel - originX,
+            round(pos.y / texel) * texel - originY
         )
     }
 
@@ -124,7 +126,3 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
         rotateBy(-90f)
     }
 }
-
-const val PIXEL_SIZE = COMPONENT_UNIT_SIZE / 20
-fun Float.toPixel() = MathUtils.round(this / PIXEL_SIZE)
-fun Int.toCordi() = this * PIXEL_SIZE
