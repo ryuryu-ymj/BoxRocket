@@ -12,7 +12,7 @@ import ktx.box2d.body
 import ktx.box2d.box
 import ktx.box2d.rayCast
 
-const val GLOBAL_SCALE = 1.005f
+const val GLOBAL_SCALE = 1.00f
 
 class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) : Actor() {
     private val region = asset.get<TextureAtlas>("atlas/play.atlas").findRegion("rocket")
@@ -92,16 +92,10 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
         super.act(delta)
 
         val pos = body.position
-        x = if (horizontalContact > 0) {
-            pos.x.toPixel().toCordi()
-        } else {
-            pos.x
-        } - originX
-        y = if (verticalContact > 0) {
-            pos.y.toPixel().toCordi()
-        } else {
-            pos.y
-        } - originY
+        setPosition(
+            pos.x/*.toPixel().toCordi()*/ - originX,
+            pos.y/*.toPixel().toCordi()*/ - originY
+        )
     }
 
     fun jet() {
