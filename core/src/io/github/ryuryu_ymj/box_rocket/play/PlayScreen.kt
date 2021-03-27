@@ -19,7 +19,7 @@ var courseIndex = 1
 
 class PlayScreen(private val game: MyGame) : KtxScreen {
     private val batch = SpriteBatch()
-    private val camera = OrthographicCamera(25.6f, 14.4f)
+    private val camera = OrthographicCamera(20f, 20f * 9 / 16)
     private val viewport = FitViewport(
         camera.viewportWidth,
         camera.viewportHeight, camera

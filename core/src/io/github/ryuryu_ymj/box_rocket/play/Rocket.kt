@@ -93,7 +93,7 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
         super.act(delta)
 
         val pos = body.position
-        val texel = COMPONENT_UNIT_SIZE / 20
+        val texel = COMPONENT_UNIT_SIZE / 16
         setPosition(
             round(pos.x / texel) * texel - originX,
             round(pos.y / texel) * texel - originY
