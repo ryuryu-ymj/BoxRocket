@@ -29,6 +29,10 @@ class Brush : Label("MOVE", Scene2DSkin.defaultSkin, defaultStyle) {
                 type = BrushType.GROUND
                 setText(type.name)
             }
+            Gdx.input.isKeyJustPressed(Input.Keys.B) -> {
+                type = BrushType.BLOCK
+                setText(type.name)
+            }
         }
     }
 }
@@ -36,5 +40,5 @@ class Brush : Label("MOVE", Scene2DSkin.defaultSkin, defaultStyle) {
 enum class BrushType {
     MOVE, DELETE,
     START,
-    GROUND,
+    GROUND, BLOCK
 }

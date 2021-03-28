@@ -58,10 +58,22 @@ class CourseReader {
         for (line in file.readString().lines()) {
             if (line.isBlank()) continue
             val cells = line.split(',')
-            val region = atlas.findRegion(cells[0])
-            val x = cells[1].toFloat()
-            val y = cells[2].toFloat()
-            stage.addActor(Ground(region, x, y))
+            val name = cells[0]
+            if (name.first() == 'g') {
+                val region = atlas.findRegion(name)
+                val x = cells[1].toFloat()
+                val y = cells[2].toFloat()
+                stage.addActor(ImageObject(region, x, y))
+            } else {
+                when (name) {
+                    "block" -> {
+                        val region = atlas.findRegion(name)
+                        val x = cells[1].toFloat()
+                        val y = cells[2].toFloat()
+                        stage.addActor(ImageObject(region, x, y))
+                    }
+                }
+            }
         }
     }
 }

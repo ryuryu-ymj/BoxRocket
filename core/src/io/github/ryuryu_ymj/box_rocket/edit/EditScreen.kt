@@ -32,7 +32,7 @@ import kotlin.math.min
 
 class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
     private val batch = SpriteBatch()
-    private val camera = OrthographicCamera(25.6f, 14.4f)
+    private val camera = OrthographicCamera(20f, 20f * 9 / 16)
     private val viewport = FitViewport(
         camera.viewportWidth,
         camera.viewportHeight, camera
@@ -234,6 +234,13 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
                         }
                     }
                 }
+                BrushType.BLOCK -> {
+                    for (ix in rangeX) {
+                        for (iy in rangeY) {
+                            addCourseComponent(CourseComponentType.BLOCK, ix, iy)
+                        }
+                    }
+                }
                 BrushType.START -> {
                     removeCourseComponent(beginIX, beginIY)
                     addCourseComponent(CourseComponentType.START, beginIX, beginIY)?.let {
@@ -348,10 +355,11 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
         courseComponents.remove(start)
         courseComponents.sortBy { it.iy }
 
-        courseComponents.forEach { cmp ->
-            cmp.setContact(courseComponents)
+        val grounds = courseComponents.filter { it.type == CourseComponentType.GROUND }
+        grounds.forEach { g ->
+            g.setContact(grounds)
             var name = "g"
-            cmp.contact.forEach {
+            g.contact.forEach {
                 name += if (it) "1" else "0"
             }
             when (name) {
@@ -362,13 +370,21 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
                 }
                 else -> {
                     print("there are no such ground, so it was converted to block ")
-                    println("at (${cmp.ix}, ${cmp.iy})")
+                    println("at (${g.ix}, ${g.iy})")
                     name = "block"
                 }
             }
             writer.print("$name,")
-            writer.print("${(cmp.ix - start.ix) * COMPONENT_UNIT_SIZE},")
-            writer.print("${(cmp.iy - start.iy) * COMPONENT_UNIT_SIZE},")
+            writer.print("${(g.ix - start.ix) * COMPONENT_UNIT_SIZE},")
+            writer.print("${(g.iy - start.iy) * COMPONENT_UNIT_SIZE},")
+            writer.println()
+        }
+        courseComponents.filter {
+            it.type == CourseComponentType.BLOCK
+        }.forEach {
+            writer.print("block,")
+            writer.print("${(it.ix - start.ix) * COMPONENT_UNIT_SIZE},")
+            writer.print("${(it.iy - start.iy) * COMPONENT_UNIT_SIZE},")
             writer.println()
         }
 

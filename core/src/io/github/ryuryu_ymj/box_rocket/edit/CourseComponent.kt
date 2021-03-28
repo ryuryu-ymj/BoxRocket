@@ -1,8 +1,8 @@
 package io.github.ryuryu_ymj.box_rocket.edit
 
 import com.badlogic.gdx.assets.AssetManager
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.Batch
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.scenes.scene2d.Actor
 
 const val COMPONENT_UNIT_SIZE = 1f
@@ -13,7 +13,7 @@ class CourseComponent(
     val ix: Int, val iy: Int
 ) : Actor() {
     val contact = BooleanArray(4) { false }
-    private val texture: Texture = asset.get(type.texturePath)
+    private val texture = asset.get<TextureAtlas>("atlas/play.atlas").findRegion(type.regionName)
 
     init {
         setPosition(ix * COMPONENT_UNIT_SIZE, iy * COMPONENT_UNIT_SIZE)
@@ -50,8 +50,9 @@ class CourseComponentData(
 }
 
 enum class CourseComponentType(
-    val texturePath: String
+    val regionName: String
 ) {
-    GROUND("image/ground.png"),
-    START("image/start.png")
+    START("rocket"),
+    GROUND("g1011"),
+    BLOCK("block"),
 }

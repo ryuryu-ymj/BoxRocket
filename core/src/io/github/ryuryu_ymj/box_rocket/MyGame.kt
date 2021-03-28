@@ -15,8 +15,6 @@ class MyGame : KtxGame<KtxScreen>() {
     val asset = AssetManager()
 
     override fun create() {
-        asset.load<Texture>("image/ground.png")
-        asset.load<Texture>("image/start.png")
         asset.load<TextureAtlas>("atlas/play.atlas")
         asset.load<Skin>("skin/test-skin.json")
 
