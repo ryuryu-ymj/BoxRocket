@@ -1,5 +1,6 @@
 package io.github.ryuryu_ymj.box_rocket.play
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
@@ -7,10 +8,7 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.physics.box2d.*
 import com.badlogic.gdx.scenes.scene2d.Actor
 import io.github.ryuryu_ymj.box_rocket.edit.COMPONENT_UNIT_SIZE
-import ktx.box2d.RayCast
-import ktx.box2d.body
-import ktx.box2d.box
-import ktx.box2d.rayCast
+import ktx.box2d.*
 import kotlin.math.round
 
 class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) : Actor() {
@@ -27,7 +25,20 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
         setPosition(x, y)
         rotation = 90f
         body = world.body {
-            box(width, height) {
+            val half = width * 0.985f / 2
+            val corner = width / 20 * 1.2f
+            polygon(
+                floatArrayOf(
+                    -half + corner, -half,
+                    half - corner, -half,
+                    half, -half + corner,
+                    half, half - corner,
+                    half - corner, half,
+                    -half + corner, half,
+                    -half, half - corner,
+                    -half, -half + corner,
+                )
+            ) {
                 density = 10f
                 friction = 0.5f
             }
@@ -91,10 +102,17 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
 
         val pos = body.position
         val texel = COMPONENT_UNIT_SIZE / 16
-        setPosition(
-            round(pos.x / texel) * texel - originX,
+        val pixel = stage.height / Gdx.graphics.height
+        x = if (horizontalContact > 0) {
+            round(pos.x / texel) * texel - originX
+        } else {
+            round(pos.x / pixel) * pixel - originX
+        }
+        y = if (verticalContact > 0) {
             round(pos.y / texel) * texel - originY
-        )
+        } else {
+            round(pos.y / pixel) * pixel - originY
+        }
     }
 
     fun jet() {
