@@ -102,7 +102,7 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
 
         val pos = body.position
         val texel = COMPONENT_UNIT_SIZE / 16
-        val pixel = stage.height / Gdx.graphics.height
+        val pixel = stage.height / stage.viewport.screenHeight
         x = if (horizontalContact > 0) {
             round(pos.x / texel) * texel - originX
         } else {

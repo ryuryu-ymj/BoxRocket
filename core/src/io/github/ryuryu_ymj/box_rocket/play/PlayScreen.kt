@@ -62,7 +62,7 @@ class PlayScreen(private val game: MyGame) : KtxScreen {
         world.step(1f / 60, 6, 2)
         stage.act()
         //camera.position.set(rocket.x + rocket.originX, rocket.y + rocket.originY, 0f)
-        val pixel = stage.height / Gdx.graphics.height
+        val pixel = stage.height / viewport.screenHeight
         camera.position.set(
             round((rocket.x + rocket.originX) / pixel) * pixel,
             round((rocket.y + rocket.originY) / pixel) * pixel,
