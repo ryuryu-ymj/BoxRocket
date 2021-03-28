@@ -357,11 +357,11 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
             when (name) {
                 "g1111", "g1101", "g1011", "g1001", "g0111", "g0011" -> {
                 }
-                "g1110" -> {
+                "g1110", "g1100", "0110" -> {
                     name = "g1111"
                 }
                 else -> {
-                    print("接触状態が用意されていないGroundが指定されたため，ブロックに置き換えました ")
+                    print("there are no such ground, so it was converted to block ")
                     println("at (${cmp.ix}, ${cmp.iy})")
                     name = "block"
                 }
