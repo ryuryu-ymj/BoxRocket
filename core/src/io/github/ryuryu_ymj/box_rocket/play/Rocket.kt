@@ -13,8 +13,6 @@ import ktx.box2d.box
 import ktx.box2d.rayCast
 import kotlin.math.round
 
-const val GLOBAL_SCALE = 1.00f
-
 class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) : Actor() {
     private val region = asset.get<TextureAtlas>("atlas/play.atlas").findRegion("rocket")
     private val body: Body
@@ -27,7 +25,6 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
         setSize(COMPONENT_UNIT_SIZE, COMPONENT_UNIT_SIZE)
         setOrigin(width / 2, height / 2)
         setPosition(x, y)
-        setScale(GLOBAL_SCALE)
         rotation = 90f
         body = world.body {
             box(width, height) {

@@ -346,12 +346,25 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
         val start = start ?: return
         val courseComponents = courseComponents.toMutableList()
         courseComponents.remove(start)
+        courseComponents.sortBy { it.iy }
 
         courseComponents.forEach { cmp ->
             cmp.setContact(courseComponents)
             var name = "g"
             cmp.contact.forEach {
                 name += if (it) "1" else "0"
+            }
+            when (name) {
+                "g1111", "g1101", "g1011", "g1001", "g0111", "g0011" -> {
+                }
+                "g1110" -> {
+                    name = "g1111"
+                }
+                else -> {
+                    print("接触状態が用意されていないGroundが指定されたため，ブロックに置き換えました ")
+                    println("at (${cmp.ix}, ${cmp.iy})")
+                    name = "block"
+                }
             }
             writer.print("$name,")
             writer.print("${(cmp.ix - start.ix) * COMPONENT_UNIT_SIZE},")

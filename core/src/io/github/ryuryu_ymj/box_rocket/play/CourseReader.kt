@@ -58,7 +58,7 @@ class CourseReader {
         for (line in file.readString().lines()) {
             if (line.isBlank()) continue
             val cells = line.split(',')
-            val region = atlas.findRegion("block")
+            val region = atlas.findRegion(cells[0])
             val x = cells[1].toFloat()
             val y = cells[2].toFloat()
             stage.addActor(Ground(region, x, y))

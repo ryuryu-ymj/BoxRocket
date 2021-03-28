@@ -7,15 +7,14 @@ import io.github.ryuryu_ymj.box_rocket.edit.COMPONENT_UNIT_SIZE
 
 class Ground(private val region: TextureRegion, x: Float, y: Float) : Actor() {
     init {
-        setPosition(x, y)
-        setSize(COMPONENT_UNIT_SIZE, COMPONENT_UNIT_SIZE)
-        setScale(GLOBAL_SCALE)
+        setSize(
+            COMPONENT_UNIT_SIZE * region.regionWidth / 16,
+            COMPONENT_UNIT_SIZE * region.regionHeight / 16
+        )
+        setPosition(x, y - height + COMPONENT_UNIT_SIZE)
     }
 
     override fun draw(batch: Batch, parentAlpha: Float) {
-        batch.draw(
-            region, x, y, originX, originY,
-            width, height, scaleX, scaleY, rotation
-        )
+        batch.draw(region, x, y, width, height)
     }
 }
