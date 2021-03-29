@@ -56,11 +56,6 @@ class PlayScreen(private val game: MyGame) : KtxScreen {
         stage.draw()
         //debugRenderer.render(world, camera.combined)
 
-        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
-            rocket.rotate()
-        } else if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
-            rocket.jet()
-        }
         world.step(1f / 60, 6, 2)
         stage.act()
         //camera.position.set(rocket.x + rocket.originX, rocket.y + rocket.originY, 0f)

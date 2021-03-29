@@ -1,5 +1,7 @@
 package io.github.ryuryu_ymj.box_rocket.play
 
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.Input
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
@@ -7,7 +9,9 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.physics.box2d.*
 import com.badlogic.gdx.scenes.scene2d.Actor
 import io.github.ryuryu_ymj.box_rocket.edit.COMPONENT_UNIT_SIZE
+import ktx.assets.pool
 import ktx.box2d.*
+import ktx.collections.GdxArray
 import kotlin.math.round
 
 const val TEXEL = COMPONENT_UNIT_SIZE / 16
@@ -19,6 +23,10 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
     private var horizontalContact = 0
     private val verticalSensor: Fixture
     private var verticalContact = 0
+
+    private val activeSmokes = GdxArray<Smoke>(8)
+    private val smokePool = pool(8) { Smoke(asset) }
+    private var counter = 0
 
     init {
         setSize(COMPONENT_UNIT_SIZE, COMPONENT_UNIT_SIZE)
@@ -96,10 +104,17 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
             region, x, y, originX, originY,
             width, height, scaleX, scaleY, rotation
         )
+        activeSmokes.forEach { it.draw(batch, parentAlpha) }
     }
 
     override fun act(delta: Float) {
         super.act(delta)
+
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
+            rotateBy(-90f)
+        } else if (Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            jet()
+        }
 
         val pos = body.position
         val pixel = stage.height / stage.viewport.screenHeight
@@ -113,15 +128,26 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
         } else {
             round(pos.y / pixel) * pixel - originY
         }
+
+        activeSmokes.forEach {
+            it.act(delta)
+            if (!it.active) {
+                activeSmokes.removeValue(it, true)
+                smokePool.free(it)
+            }
+        }
     }
 
-    fun jet() {
+    private fun jet() {
+        val cos = MathUtils.cosDeg(rotation)
+        val sin = MathUtils.sinDeg(rotation)
+
         var minFrac = 1f
         world.rayCast(
-            x + originX - width / 2 * MathUtils.cosDeg(rotation),
-            y + originY - width / 2 * MathUtils.sinDeg(rotation),
-            x + originX - width * 2 * MathUtils.cosDeg(rotation),
-            y + originY - width * 2 * MathUtils.sinDeg(rotation)
+            x + originX - width / 2 * cos,
+            y + originY - width / 2 * sin,
+            x + originX - width * 2 * cos,
+            y + originY - width * 2 * sin
         ) { _, _, _, fraction ->
             if (fraction < minFrac) minFrac = fraction
             RayCast.IGNORE
@@ -131,13 +157,22 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
         val f = 40f / (minFrac + 0.1f)
         //println("jet: $f, weight: ${body.mass * world.gravity.len()}")
         body.applyForceToCenter(
-            f * MathUtils.cosDeg(rotation),
-            f * MathUtils.sinDeg(rotation),
+            f * cos,
+            f * sin,
             true
         )
-    }
 
-    fun rotate() {
-        rotateBy(-90f)
+        if (counter % 10 == 0) {
+            val rnd = MathUtils.random(width / 2) - width / 4
+            smokePool.obtain().let {
+                activeSmokes.add(it)
+                it.init(
+                    x + originX - width / 2 * cos + rnd * sin,
+                    y + originY - height / 2 * sin - rnd * cos,
+                    rotation + 180
+                )
+            }
+        }
+        counter++
     }
 }
