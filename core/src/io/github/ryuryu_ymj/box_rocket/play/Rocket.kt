@@ -17,6 +17,7 @@ import kotlin.math.round
 class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) : Actor() {
     private val region = asset.get<TextureAtlas>("atlas/play.atlas").findRegion("rocket")
     private val body: Body
+    private val bodyFixture: Fixture
     private val horizontalSensor: Fixture
     private var horizontalContact = 0
     private val verticalSensor: Fixture
@@ -31,29 +32,30 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
         setOrigin(width / 2, height / 2)
         setPosition(x, y)
         rotation = 90f
+
         body = world.body {
-            val half = width * 0.985f / 2
-            val corner = width / 20 * 1.2f
-            polygon(
-                floatArrayOf(
-                    -half + corner, -half,
-                    half - corner, -half,
-                    half, -half + corner,
-                    half, half - corner,
-                    half - corner, half,
-                    -half + corner, half,
-                    -half, half - corner,
-                    -half, -half + corner,
-                )
-            ) {
-                density = 10f
-                friction = 0.5f
-            }
             type = BodyDef.BodyType.DynamicBody
             linearDamping = 0.1f
             //angularDamping = 1f
             fixedRotation = true
             position.set(x + originX, y + originY)
+        }
+        val half = width * 0.985f / 2
+        val corner = width / 20 * 1.2f
+        bodyFixture = body.polygon(
+            floatArrayOf(
+                -half + corner, -half,
+                half - corner, -half,
+                half, -half + corner,
+                half, half - corner,
+                half - corner, half,
+                -half + corner, half,
+                -half, half - corner,
+                -half, -half + corner,
+            )
+        ) {
+            density = 10f
+            friction = 0.5f
         }
         horizontalSensor = body.box(width, height * 0.9f) {
             density = 0f
@@ -66,26 +68,33 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
 
         world.setContactListener(object : ContactListener {
             override fun beginContact(contact: Contact) {
-                if (contact.fixtureA === horizontalSensor ||
-                    contact.fixtureB === horizontalSensor
-                ) {
-                    horizontalContact++
-                } else if (contact.fixtureA === verticalSensor ||
-                    contact.fixtureB === verticalSensor
-                ) {
-                    verticalContact++
+                contact.check(horizontalSensor)?.let {
+                    if (it.userData == ContactInfo.OBSTACLE) {
+                        horizontalContact++
+                    }
+                }
+                contact.check(verticalSensor)?.let {
+                    if (it.userData == ContactInfo.OBSTACLE) {
+                        verticalContact++
+                    }
+                }
+                contact.check(bodyFixture)?.let {
+                    if (it.userData == ContactInfo.DAMAGE) {
+                        println("damage")
+                    }
                 }
             }
 
             override fun endContact(contact: Contact) {
-                if (contact.fixtureA === horizontalSensor ||
-                    contact.fixtureB === horizontalSensor
-                ) {
-                    horizontalContact--
-                } else if (contact.fixtureA === verticalSensor ||
-                    contact.fixtureB === verticalSensor
-                ) {
-                    verticalContact--
+                contact.check(horizontalSensor)?.let {
+                    if (it.userData == ContactInfo.OBSTACLE) {
+                        horizontalContact--
+                    }
+                }
+                contact.check(verticalSensor)?.let {
+                    if (it.userData == ContactInfo.OBSTACLE) {
+                        verticalContact--
+                    }
                 }
             }
 
@@ -171,5 +180,11 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
             }
         }
         counter++
+    }
+
+    private fun Contact.check(one: Fixture): Fixture? {
+        if (fixtureA === one) return fixtureB
+        if (fixtureB == one) return fixtureA
+        return null
     }
 }

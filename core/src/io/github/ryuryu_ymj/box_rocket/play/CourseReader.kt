@@ -14,7 +14,7 @@ import ktx.box2d.loop
 class CourseReader {
     fun readCourse(index: Int, world: World, stage: Stage, asset: AssetManager) {
         readBody(index, world)
-        readActor(index, stage, asset)
+        readActor(index, stage, asset, world)
     }
 
     private fun readBody(index: Int, world: World) {
@@ -37,6 +37,7 @@ class CourseReader {
                         loop(vertices) {
                             restitution = 0f
                             friction = 0.5f
+                            userData = ContactInfo.OBSTACLE
                         }
                         type = BodyDef.BodyType.StaticBody
                     }
@@ -45,7 +46,7 @@ class CourseReader {
         }
     }
 
-    private fun readActor(index: Int, stage: Stage, asset: AssetManager) {
+    private fun readActor(index: Int, stage: Stage, asset: AssetManager, world: World) {
         val file: FileHandle
         try {
             file = Gdx.files.internal("course/${"%02d".format(index)}actor")
@@ -63,14 +64,20 @@ class CourseReader {
                 val region = atlas.findRegion(name)
                 val x = cells[1].toFloat()
                 val y = cells[2].toFloat()
-                stage.addActor(ImageObject(region, x, y))
+                stage.addActor(Obstacle(region, x, y))
             } else {
                 when (name) {
                     "block" -> {
                         val region = atlas.findRegion(name)
                         val x = cells[1].toFloat()
                         val y = cells[2].toFloat()
-                        stage.addActor(ImageObject(region, x, y))
+                        stage.addActor(Obstacle(region, x, y))
+                    }
+                    "thorn" -> {
+                        val x = cells[1].toFloat()
+                        val y = cells[2].toFloat()
+                        val dir = cells[3].toInt()
+                        stage.addActor(Thorn(asset, world, x, y, dir))
                     }
                 }
             }

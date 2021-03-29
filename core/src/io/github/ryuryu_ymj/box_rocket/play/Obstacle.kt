@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.badlogic.gdx.scenes.scene2d.Actor
 import io.github.ryuryu_ymj.box_rocket.edit.COMPONENT_UNIT_SIZE
 
-class ImageObject(private val region: TextureRegion, x: Float, y: Float) : Actor() {
+class Obstacle(private val region: TextureRegion, x: Float, y: Float) : Actor() {
     init {
         setSize(
             COMPONENT_UNIT_SIZE * region.regionWidth / 16,
