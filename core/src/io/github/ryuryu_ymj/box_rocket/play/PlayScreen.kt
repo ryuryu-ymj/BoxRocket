@@ -9,11 +9,15 @@ import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FitViewport
 import io.github.ryuryu_ymj.box_rocket.MyGame
+import io.github.ryuryu_ymj.box_rocket.edit.COMPONENT_UNIT_SIZE
 import io.github.ryuryu_ymj.box_rocket.edit.EditScreen
 import ktx.app.KtxScreen
 import ktx.box2d.createWorld
 import ktx.math.vec2
 import kotlin.math.round
+
+const val TEXEL = COMPONENT_UNIT_SIZE / 16
+var pixel = 0f; private set
 
 var courseIndex = 1
 
@@ -34,6 +38,10 @@ class PlayScreen(private val game: MyGame) : KtxScreen {
     private lateinit var rocket: Rocket
     private val bg = Background(game.asset)
 
+    init {
+        pixel = stage.height / viewport.screenHeight
+    }
+
     override fun show() {
         stage.addActor(bg)
         world = createWorld(gravity)
@@ -50,6 +58,7 @@ class PlayScreen(private val game: MyGame) : KtxScreen {
 
     override fun resize(width: Int, height: Int) {
         viewport.update(width, height)
+        pixel = stage.height / viewport.screenHeight
     }
 
     override fun render(delta: Float) {
@@ -59,7 +68,6 @@ class PlayScreen(private val game: MyGame) : KtxScreen {
         world.step(1f / 60, 6, 2)
         stage.act()
         //camera.position.set(rocket.x + rocket.originX, rocket.y + rocket.originY, 0f)
-        val pixel = stage.height / viewport.screenHeight
         camera.position.set(
             round((rocket.x + rocket.originX) / pixel) * pixel,
             round((rocket.y + rocket.originY) / pixel) * pixel,

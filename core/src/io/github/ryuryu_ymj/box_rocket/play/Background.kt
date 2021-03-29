@@ -41,7 +41,6 @@ private class BGLayer(
             -floor((x - stage.camera.position.x + stage.width / 2) / width) * width,
             -floor((y - stage.camera.position.y + stage.height / 2) / height) * height,
         )
-        val pixel = stage.height / stage.viewport.screenHeight
         setPosition(
             round(x / pixel) * pixel,
             round(y / pixel) * pixel

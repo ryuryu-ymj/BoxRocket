@@ -14,8 +14,6 @@ import ktx.box2d.*
 import ktx.collections.GdxArray
 import kotlin.math.round
 
-const val TEXEL = COMPONENT_UNIT_SIZE / 16
-
 class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) : Actor() {
     private val region = asset.get<TextureAtlas>("atlas/play.atlas").findRegion("rocket")
     private val body: Body
@@ -117,7 +115,6 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
         }
 
         val pos = body.position
-        val pixel = stage.height / stage.viewport.screenHeight
         x = if (horizontalContact > 0) {
             round(pos.x / TEXEL) * TEXEL - originX
         } else {
