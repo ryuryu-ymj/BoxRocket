@@ -10,6 +10,8 @@ import io.github.ryuryu_ymj.box_rocket.edit.COMPONENT_UNIT_SIZE
 import ktx.box2d.*
 import kotlin.math.round
 
+const val TEXEL = COMPONENT_UNIT_SIZE / 16
+
 class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) : Actor() {
     private val region = asset.get<TextureAtlas>("atlas/play.atlas").findRegion("rocket")
     private val body: Body
@@ -100,15 +102,14 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
         super.act(delta)
 
         val pos = body.position
-        val texel = COMPONENT_UNIT_SIZE / 16
         val pixel = stage.height / stage.viewport.screenHeight
         x = if (horizontalContact > 0) {
-            round(pos.x / texel) * texel - originX
+            round(pos.x / TEXEL) * TEXEL - originX
         } else {
             round(pos.x / pixel) * pixel - originX
         }
         y = if (verticalContact > 0) {
-            round(pos.y / texel) * texel - originY
+            round(pos.y / TEXEL) * TEXEL - originY
         } else {
             round(pos.y / pixel) * pixel - originY
         }

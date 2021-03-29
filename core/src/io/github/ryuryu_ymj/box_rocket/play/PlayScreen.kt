@@ -32,8 +32,10 @@ class PlayScreen(private val game: MyGame) : KtxScreen {
 
     private val course = CourseReader()
     private lateinit var rocket: Rocket
+    private val bg = Background(game.asset)
 
     override fun show() {
+        stage.addActor(bg)
         world = createWorld(gravity)
         course.readCourse(courseIndex, world, stage, game.asset)
         rocket = Rocket(game.asset, world, 0f, 0f)
