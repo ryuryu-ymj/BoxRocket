@@ -74,7 +74,10 @@ class PlayScreen(private val game: MyGame) : KtxScreen {
             0f
         )
 
-        if (!rocket.alive) {
+        if (!rocket.isAlive) {
+            game.setScreen<PlayScreen>()
+        } else if (rocket.isGoal) {
+            courseIndex++
             game.setScreen<PlayScreen>()
         }
 

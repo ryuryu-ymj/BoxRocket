@@ -28,7 +28,9 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
     private val smokePool = pool(8) { Smoke(asset) }
     private var counter = 0
 
-    var alive = true
+    var isAlive = true
+    var isGoal = false
+    private var isOnGoal = false
 
     init {
         setSize(COMPONENT_UNIT_SIZE, COMPONENT_UNIT_SIZE)
@@ -78,17 +80,18 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
                         horizontalContact++
                     }
                 }
-                contact.check(verticalSensor)?.let {
-                    if (it.userData == ContactInfo.OBSTACLE ||
-                        it.userData == ContactInfo.GOAL
-                    ) {
+                contact.check(verticalSensor)?.also {
+                    if (it.userData == ContactInfo.OBSTACLE) {
+                        verticalContact++
+                    } else if (it.userData == ContactInfo.GOAL) {
+                        isOnGoal = true
                         verticalContact++
                     }
                 }
                 contact.check(bodyFixture)?.let {
                     if (it.userData == ContactInfo.DAMAGE) {
                         //println("damage")
-                        alive = false
+                        isAlive = false
                     }
                 }
             }
@@ -101,10 +104,11 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
                         horizontalContact--
                     }
                 }
-                contact.check(verticalSensor)?.let {
-                    if (it.userData == ContactInfo.OBSTACLE ||
-                        it.userData == ContactInfo.GOAL
-                    ) {
+                contact.check(verticalSensor)?.also {
+                    if (it.userData == ContactInfo.OBSTACLE) {
+                        verticalContact--
+                    } else if (it.userData == ContactInfo.GOAL) {
+                        isOnGoal = false
                         verticalContact--
                     }
                 }
@@ -128,6 +132,10 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
 
     override fun act(delta: Float) {
         super.act(delta)
+
+        if (isOnGoal && !body.isAwake) {
+            isGoal = true
+        }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ENTER)) {
             rotateBy(-90f)
