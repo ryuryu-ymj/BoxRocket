@@ -56,11 +56,12 @@ class CourseReader {
         }
 
         val atlas = asset.get<TextureAtlas>("atlas/play.atlas")
+        val ground = Regex("g\\d\\d\\d\\d")
         for (line in file.readString().lines()) {
             if (line.isBlank()) continue
             val cells = line.split(',')
             val name = cells[0]
-            if (name.first() == 'g') {
+            if (name.matches(ground)) {
                 val region = atlas.findRegion(name)
                 val x = cells[1].toFloat()
                 val y = cells[2].toFloat()
@@ -78,6 +79,11 @@ class CourseReader {
                         val y = cells[2].toFloat()
                         val dir = cells[3].toInt()
                         stage.addActor(Thorn(asset, world, x, y, dir))
+                    }
+                    "goal" -> {
+                        val x = cells[1].toFloat()
+                        val y = cells[2].toFloat()
+                        stage.addActor(Goal(asset, world, x, y))
                     }
                 }
             }

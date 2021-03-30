@@ -4,6 +4,7 @@ import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.graphics.g2d.Batch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.math.MathUtils
+import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Actor
 import io.github.ryuryu_ymj.box_rocket.edit.COMPONENT_UNIT_SIZE
@@ -41,6 +42,7 @@ class Thorn(asset: AssetManager, world: World, x: Float, y: Float, private val d
                     userData = ContactInfo.DAMAGE
                 }
             }
+            type = BodyDef.BodyType.StaticBody
             position.set(x + originX, y + originY)
             angle = rotation * MathUtils.degreesToRadians
         }

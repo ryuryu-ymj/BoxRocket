@@ -72,12 +72,16 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
         world.setContactListener(object : ContactListener {
             override fun beginContact(contact: Contact) {
                 contact.check(horizontalSensor)?.let {
-                    if (it.userData == ContactInfo.OBSTACLE) {
+                    if (it.userData == ContactInfo.OBSTACLE ||
+                        it.userData == ContactInfo.GOAL
+                    ) {
                         horizontalContact++
                     }
                 }
                 contact.check(verticalSensor)?.let {
-                    if (it.userData == ContactInfo.OBSTACLE) {
+                    if (it.userData == ContactInfo.OBSTACLE ||
+                        it.userData == ContactInfo.GOAL
+                    ) {
                         verticalContact++
                     }
                 }
@@ -91,12 +95,16 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
 
             override fun endContact(contact: Contact) {
                 contact.check(horizontalSensor)?.let {
-                    if (it.userData == ContactInfo.OBSTACLE) {
+                    if (it.userData == ContactInfo.OBSTACLE ||
+                        it.userData == ContactInfo.GOAL
+                    ) {
                         horizontalContact--
                     }
                 }
                 contact.check(verticalSensor)?.let {
-                    if (it.userData == ContactInfo.OBSTACLE) {
+                    if (it.userData == ContactInfo.OBSTACLE ||
+                        it.userData == ContactInfo.GOAL
+                    ) {
                         verticalContact--
                     }
                 }
