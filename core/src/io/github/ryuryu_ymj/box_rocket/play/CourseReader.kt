@@ -2,7 +2,6 @@ package io.github.ryuryu_ymj.box_rocket.play
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.assets.AssetManager
-import com.badlogic.gdx.files.FileHandle
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
@@ -18,14 +17,15 @@ class CourseReader {
     }
 
     private fun readBody(index: Int, world: World) {
-        val file: FileHandle
+        val text: String
         try {
-            file = Gdx.files.internal("course/${"%02d".format(index)}body")
+            val file = Gdx.files.internal("course/${"%02d".format(index)}body")
+            text = file.readString()
         } catch (e: GdxRuntimeException) {
-            Gdx.app.error("my-error", "コースファイルの読み込みに失敗しました", e)
+            Gdx.app.error("my-error", "cannot read body file", e)
             return
         }
-        for (line in file.readString().lines()) {
+        for (line in text.lines()) {
             if (line.isBlank()) continue
             val cells = line.split(',')
             when (cells[0]) {
@@ -47,17 +47,18 @@ class CourseReader {
     }
 
     private fun readActor(index: Int, stage: Stage, asset: AssetManager, world: World) {
-        val file: FileHandle
+        val text: String
         try {
-            file = Gdx.files.internal("course/${"%02d".format(index)}actor")
+            val file = Gdx.files.internal("course/${"%02d".format(index)}actor")
+            text = file.readString()
         } catch (e: GdxRuntimeException) {
-            Gdx.app.error("my-error", "コースファイルの読み込みに失敗しました", e)
+            Gdx.app.error("my-error", "cannot read actor file", e)
             return
         }
 
         val atlas = asset.get<TextureAtlas>("atlas/play.atlas")
         val ground = Regex("g\\d\\d\\d\\d")
-        for (line in file.readString().lines()) {
+        for (line in text.lines()) {
             if (line.isBlank()) continue
             val cells = line.split(',')
             val name = cells[0]

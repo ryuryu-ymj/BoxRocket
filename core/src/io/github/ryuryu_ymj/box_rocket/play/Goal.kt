@@ -9,7 +9,7 @@ import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Actor
 import io.github.ryuryu_ymj.box_rocket.edit.COMPONENT_UNIT_SIZE
 import ktx.box2d.body
-import ktx.box2d.box
+import ktx.box2d.polygon
 
 class Goal(asset: AssetManager, world: World, x: Float, y: Float) : Actor() {
     private val region: TextureRegion =
@@ -21,11 +21,18 @@ class Goal(asset: AssetManager, world: World, x: Float, y: Float) : Actor() {
         setPosition(x + COMPONENT_UNIT_SIZE / 2 - originX, y)
 
         world.body {
-            box(width, 9 * TEXEL) {
+            polygon(
+                floatArrayOf(
+                    0f * TEXEL, 0f * TEXEL,
+                    16f * TEXEL, 0f * TEXEL,
+                    21f * TEXEL, 9f * TEXEL,
+                    -5f * TEXEL, 9f * TEXEL,
+                )
+            ) {
                 userData = ContactInfo.GOAL
             }
             type = BodyDef.BodyType.StaticBody
-            position.set(x + COMPONENT_UNIT_SIZE / 2, y + 4.5f * TEXEL)
+            position.set(x, y)
         }
     }
 
