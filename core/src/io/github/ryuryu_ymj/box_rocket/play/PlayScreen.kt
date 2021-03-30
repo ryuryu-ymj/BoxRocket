@@ -63,7 +63,7 @@ class PlayScreen(private val game: MyGame) : KtxScreen {
 
     override fun render(delta: Float) {
         stage.draw()
-        debugRenderer.render(world, camera.combined)
+        //debugRenderer.render(world, camera.combined)
 
         world.step(1f / 60, 6, 2)
         stage.act()

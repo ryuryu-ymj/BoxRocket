@@ -33,12 +33,18 @@ class Brush : Label("MOVE", Scene2DSkin.defaultSkin, defaultStyle) {
                 type = BrushType.BLOCK
                 setText(type.name)
             }
+            Gdx.input.isKeyJustPressed(Input.Keys.T) -> {
+                type = BrushType.THORN
+                setText(type.name)
+            }
         }
     }
 }
 
-enum class BrushType {
+enum class BrushType(val courseComponentType: CourseComponentType? = null) {
     MOVE, DELETE,
-    START,
-    GROUND, BLOCK
+    START(CourseComponentType.START),
+    GROUND(CourseComponentType.GROUND),
+    BLOCK(CourseComponentType.BLOCK),
+    THORN(CourseComponentType.THORN),
 }

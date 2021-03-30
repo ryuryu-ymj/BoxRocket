@@ -12,7 +12,7 @@ class CourseComponent(
     val type: CourseComponentType,
     val ix: Int, val iy: Int
 ) : Actor() {
-    val contact = BooleanArray(4) { false }
+    val contact = Array<CourseComponentType?>(4) { null }
     private val texture = asset.get<TextureAtlas>("atlas/play.atlas").findRegion(type.regionName)
 
     init {
@@ -29,10 +29,10 @@ class CourseComponent(
         CourseComponentData(type, ix, iy)
 
     fun setContact(components: List<CourseComponent>) {
-        contact[0] = components.findAt(ix + 1, iy) != null
-        contact[1] = components.findAt(ix, iy + 1) != null
-        contact[2] = components.findAt(ix - 1, iy) != null
-        contact[3] = components.findAt(ix, iy - 1) != null
+        contact[0] = components.findAt(ix + 1, iy)?.type
+        contact[1] = components.findAt(ix, iy + 1)?.type
+        contact[2] = components.findAt(ix - 1, iy)?.type
+        contact[3] = components.findAt(ix, iy - 1)?.type
     }
 }
 
@@ -55,4 +55,5 @@ enum class CourseComponentType(
     START("rocket"),
     GROUND("g1011"),
     BLOCK("block"),
+    THORN("thorn_edge"),
 }

@@ -227,17 +227,12 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
                         }
                     }
                 }
-                BrushType.GROUND -> {
+                BrushType.GROUND, BrushType.BLOCK, BrushType.THORN -> {
                     for (ix in rangeX) {
                         for (iy in rangeY) {
-                            addCourseComponent(CourseComponentType.GROUND, ix, iy)
-                        }
-                    }
-                }
-                BrushType.BLOCK -> {
-                    for (ix in rangeX) {
-                        for (iy in rangeY) {
-                            addCourseComponent(CourseComponentType.BLOCK, ix, iy)
+                            brush.type.courseComponentType?.let {
+                                addCourseComponent(it, ix, iy)
+                            }
                         }
                     }
                 }
@@ -294,12 +289,14 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
         val writer = PrintWriter(file.writer(false))
 
         val start = start ?: return
-        val courseComponents = courseComponents.toMutableList()
-        courseComponents.remove(start)
+        val obstacles = courseComponents.filter {
+            it.type == CourseComponentType.GROUND ||
+                    it.type == CourseComponentType.BLOCK
+        }
 
         val edges = GdxArray<Edge>()
-        courseComponents.forEach {
-            it.setContact(courseComponents)
+        obstacles.forEach {
+            it.setContact(obstacles)
             val v = arrayOf(
                 IntVec2(it.ix, it.iy),
                 IntVec2(it.ix + 1, it.iy),
@@ -307,7 +304,7 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
                 IntVec2(it.ix, it.iy + 1),
             )
             for (i in 0..3) {
-                if (!it.contact[i]) {
+                if (it.contact[i] == null) {
                     edges.add(Edge(v[(i + 1) % 4], v[(i + 2) % 4]))
                 }
             }
@@ -360,17 +357,17 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
             g.setContact(grounds)
             var name = "g"
             g.contact.forEach {
-                name += if (it) "1" else "0"
+                name += if (it != null) "1" else "0"
             }
             when (name) {
                 "g1111", "g1101", "g1011", "g1001", "g0111", "g0011" -> {
                 }
-                "g1110", "g1100", "0110" -> {
+                "g1110", "g1100", "g0110" -> {
                     name = "g1111"
                 }
                 else -> {
-                    print("there are no such ground, so it was converted to block ")
-                    println("at (${g.ix}, ${g.iy})")
+                    print("There are no such ground, so it was converted to block ")
+                    println("(${g.ix}, ${g.iy})")
                     name = "block"
                 }
             }
@@ -385,6 +382,50 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
             writer.print("block,")
             writer.print("${(it.ix - start.ix) * COMPONENT_UNIT_SIZE},")
             writer.print("${(it.iy - start.iy) * COMPONENT_UNIT_SIZE},")
+            writer.println()
+        }
+        courseComponents.filter {
+            it.type == CourseComponentType.THORN
+        }.forEach { thorn ->
+            thorn.setContact(courseComponents)
+            var dir = -1
+            when (thorn.contact.count { it == CourseComponentType.THORN }) {
+                1 -> {
+                    for (i in 0..3) {
+                        if ((thorn.contact[(i + 1) % 4] == CourseComponentType.THORN ||
+                                    thorn.contact[(i + 3) % 4] == CourseComponentType.THORN) &&
+                            (thorn.contact[(i + 2) % 4] == CourseComponentType.GROUND ||
+                                    thorn.contact[(i + 2) % 4] == CourseComponentType.BLOCK)
+                        ) {
+                            dir = i * 2
+                        }
+                    }
+                }
+                2 -> {
+                    for (i in 0..3) {
+                        if ((thorn.contact[(i + 1) % 4] == CourseComponentType.THORN &&
+                                    thorn.contact[(i + 3) % 4] == CourseComponentType.THORN) &&
+                            (thorn.contact[(i + 2) % 4] == CourseComponentType.GROUND ||
+                                    thorn.contact[(i + 2) % 4] == CourseComponentType.BLOCK)
+                        ) {
+                            dir = i * 2
+                        } else if ((thorn.contact[i] == CourseComponentType.THORN &&
+                                    thorn.contact[(i + 1) % 4] == CourseComponentType.THORN)
+                        ) {
+                            dir = i * 2 + 1
+                        }
+                    }
+                }
+            }
+            if (dir == -1) {
+                println("Direction of thorn cannot be determined (${thorn.ix}, ${thorn.iy})")
+                dir = 2
+            }
+
+            writer.print("thorn,")
+            writer.print("${(thorn.ix - start.ix) * COMPONENT_UNIT_SIZE},")
+            writer.print("${(thorn.iy - start.iy) * COMPONENT_UNIT_SIZE},")
+            writer.print("$dir,")
             writer.println()
         }
 
