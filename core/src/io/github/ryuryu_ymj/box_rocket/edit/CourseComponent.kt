@@ -53,6 +53,7 @@ enum class CourseComponentType(
     val regionName: String
 ) {
     START("rocket"),
+    GOAL("goal"),
     GROUND("g1011"),
     BLOCK("block"),
     THORN("thorn_edge"),

@@ -50,6 +50,7 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
     private val bg = BackGround(stage.width, stage.height)
     private val courseComponents = mutableListOf<CourseComponent>()
     private var start: CourseComponent? = null
+    private var goal: CourseComponent? = null
 
     private var isSelecting = false
     private val selectBegin = vec2()
@@ -91,6 +92,8 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
                 stage.addActor(component)
                 if (component.type == CourseComponentType.START) {
                     start = component
+                } else if (component.type == CourseComponentType.GOAL) {
+                    goal = component
                 }
             }
         } catch (e: Exception) {
@@ -102,13 +105,21 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
                 stage.addActor(it)
             }
         }
+        if (goal == null) {
+            goal = CourseComponent(game.asset, CourseComponentType.GOAL, 10, 0).also {
+                courseComponents.add(it)
+                stage.addActor(it)
+            }
+        }
 
         start?.let { camera.position.set(it.x + it.originX, it.y + it.originY, 0f) }
+        courseIndexText.text = courseIndex.toString()
         Gdx.input.inputProcessor = input
     }
 
     override fun hide() {
         start = null
+        goal = null
         courseComponents.clear()
         stage.clear()
         Gdx.input.inputProcessor = null
@@ -166,12 +177,11 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
         ) {
             // clear course components
             courseComponents.forEach {
-                if (it !== start) {
+                if (it !== start && it !== goal) {
                     it.remove()
                 }
             }
-            courseComponents.clear()
-            start?.let { courseComponents.add(it) }
+            courseComponents.removeIf { it !== start && it !== goal  }
         } else if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) &&
             Gdx.input.isKeyJustPressed(Input.Keys.P)
         ) {
@@ -244,6 +254,14 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
                         start = it
                     }
                 }
+                BrushType.GOAL -> {
+                    removeCourseComponent(beginIX, beginIY)
+                    addCourseComponent(CourseComponentType.GOAL, beginIX, beginIY)?.let {
+                        courseComponents.remove(goal)
+                        goal?.remove()
+                        goal = it
+                    }
+                }
             }
             return true
         }
@@ -263,7 +281,7 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
 
     private fun removeCourseComponent(ix: Int, iy: Int): Boolean {
         val old = courseComponents.findAt(ix, iy) ?: return false
-        if (old === start) return false
+        if (old === start || old === goal) return false
         old.remove()
         courseComponents.remove(old)
         return true
@@ -351,6 +369,13 @@ class EditScreen(private val game: MyGame) : KtxScreen, MyTouchable {
         val courseComponents = courseComponents.toMutableList()
         courseComponents.remove(start)
         courseComponents.sortBy { it.iy }
+
+        goal?.let {
+            writer.print("goal,")
+            writer.print("${(it.ix - start.ix) * COMPONENT_UNIT_SIZE},")
+            writer.print("${(it.iy - start.iy) * COMPONENT_UNIT_SIZE},")
+            writer.println()
+        }
 
         val grounds = courseComponents.filter { it.type == CourseComponentType.GROUND }
         grounds.forEach { g ->
