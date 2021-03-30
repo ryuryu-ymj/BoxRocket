@@ -16,6 +16,7 @@ import kotlin.math.round
 
 class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) : Actor() {
     private val region = asset.get<TextureAtlas>("atlas/play.atlas").findRegion("rocket")
+
     private val body: Body
     private val bodyFixture: Fixture
     private val horizontalSensor: Fixture
@@ -26,6 +27,8 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
     private val activeSmokes = GdxArray<Smoke>(8)
     private val smokePool = pool(8) { Smoke(asset) }
     private var counter = 0
+
+    var alive = true
 
     init {
         setSize(COMPONENT_UNIT_SIZE, COMPONENT_UNIT_SIZE)
@@ -80,7 +83,8 @@ class Rocket(asset: AssetManager, private val world: World, x: Float, y: Float) 
                 }
                 contact.check(bodyFixture)?.let {
                     if (it.userData == ContactInfo.DAMAGE) {
-                        println("damage")
+                        //println("damage")
+                        alive = false
                     }
                 }
             }

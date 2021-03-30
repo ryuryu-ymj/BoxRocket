@@ -74,6 +74,10 @@ class PlayScreen(private val game: MyGame) : KtxScreen {
             0f
         )
 
+        if (!rocket.alive) {
+            game.setScreen<PlayScreen>()
+        }
+
         if (Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT) &&
             Gdx.input.isKeyJustPressed(Input.Keys.E)
         ) {
